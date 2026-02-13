@@ -1,0 +1,15 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "python",
+    "BACKUP_SP_OBJECT_ID": "<backup-sp-object-id>",
+    "KEYVAULT_RESOURCE_ID": "/subscriptions/<sub-id>/resourceGroups/<rg>/providers/Microsoft.KeyVault/vaults/<kv-name>",
+    "STORAGE_RESOURCE_ID": "/subscriptions/<sub-id>/resourceGroups/<rg>/providers/Microsoft.Storage/storageAccounts/<storage-name>",
+    "DCE_ENDPOINT": "https://<dce-name>.<region>.ingest.monitor.azure.com",
+    "DCR_RULE_ID": "dcr-<guid>",
+    "DCR_STREAM_NAME": "Custom-ZSPAudit_CL",
+    "BACKUP_JOB_SCHEDULE": "0 55 1 * * *",
+    "BACKUP_JOB_DURATION_MINUTES": "35"
+  }
+}

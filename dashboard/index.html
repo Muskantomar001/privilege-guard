@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrivilegeGuard — ZSP Gateway Dashboard</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-hover: #334155;
+            --border: #334155;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #06b6d4;
+            --radius: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header h1 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--accent), var(--info));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header .badge {
+            background: var(--success);
+            color: #000;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+
+        /* Config bar */
+        .config-bar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+
+        .config-bar .field { flex: 1; min-width: 200px; }
+        .config-bar label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+        .config-bar input {
+            width: 100%;
+            padding: 8px 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-family: 'Cascadia Code', monospace;
+            font-size: 0.85rem;
+        }
+
+        .config-bar button {
+            padding: 8px 20px;
+            background: var(--accent);
+            border: none;
+            border-radius: var(--radius);
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        .config-bar button:hover { background: var(--accent-hover); }
+
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.2rem;
+        }
+
+        .stat-card .label { font-size: 0.8rem; color: var(--text-muted); }
+        .stat-card .value { font-size: 2rem; font-weight: 700; margin-top: 4px; }
+        .stat-card .value.success { color: var(--success); }
+        .stat-card .value.danger { color: var(--danger); }
+        .stat-card .value.info { color: var(--info); }
+        .stat-card .value.warning { color: var(--warning); }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .tabs button {
+            padding: 10px 24px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+
+        .tabs button.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Forms */
+        .form-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-panel h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-grid .full { grid-column: 1 / -1; }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        .form-group textarea { font-family: inherit; resize: vertical; min-height: 60px; }
+
+        .btn-primary {
+            padding: 10px 28px;
+            background: var(--accent);
+            border: none;
+            border-radius: var(--radius);
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background 0.2s;
+        }
+
+        .btn-primary:hover { background: var(--accent-hover); }
+
+        .btn-danger {
+            padding: 10px 28px;
+            background: var(--danger);
+            border: none;
+            border-radius: var(--radius);
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        /* Response panel */
+        .response-panel {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: 'Cascadia Code', 'Fira Code', monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        /* Timeline */
+        .timeline { margin-top: 1rem; }
+
+        .timeline-entry {
+            display: flex;
+            gap: 1rem;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid var(--border);
+            align-items: flex-start;
+        }
+
+        .timeline-entry:last-child { border-bottom: none; }
+
+        .timeline-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+
+        .timeline-dot.grant { background: var(--success); }
+        .timeline-dot.revoke { background: var(--danger); }
+
+        .timeline-entry .time { color: var(--text-muted); font-size: 0.8rem; min-width: 160px; }
+        .timeline-entry .details { flex: 1; }
+        .timeline-entry .event-type { font-weight: 600; font-size: 0.85rem; }
+        .timeline-entry .meta { color: var(--text-muted); font-size: 0.8rem; margin-top: 2px; }
+
+        .empty { color: var(--text-muted); text-align: center; padding: 3rem; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .config-bar { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent)">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        <h1>PrivilegeGuard</h1>
+        <span class="badge" id="healthBadge">Checking...</span>
+    </div>
+
+    <div class="container">
+        <!-- Configuration -->
+        <div class="config-bar">
+            <div class="field">
+                <label>Gateway URL</label>
+                <input type="text" id="gatewayUrl" placeholder="https://yourapp.azurewebsites.net" />
+            </div>
+            <div class="field">
+                <label>Function Key</label>
+                <input type="password" id="functionKey" placeholder="Your function key" />
+            </div>
+            <button onclick="checkHealth()">Connect</button>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="label">Active Grants</div>
+                <div class="value info" id="statActive">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Grants (Session)</div>
+                <div class="value success" id="statGrants">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Revocations (Session)</div>
+                <div class="value danger" id="statRevokes">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Errors (Session)</div>
+                <div class="value warning" id="statErrors">0</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="active" onclick="switchTab('nhi')">NHI Access</button>
+            <button onclick="switchTab('admin')">Admin Access</button>
+            <button onclick="switchTab('timeline')">Event Timeline</button>
+        </div>
+
+        <!-- NHI Access Tab -->
+        <div id="tab-nhi" class="tab-content active">
+            <div class="form-panel">
+                <h3>🤖 Request NHI Access (Service Principal / AI Agent)</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Service Principal Object ID</label>
+                        <input type="text" id="nhiSpId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" />
+                    </div>
+                    <div class="form-group">
+                        <label>Scope (Azure Resource ID)</label>
+                        <input type="text" id="nhiScope" placeholder="/subscriptions/.../providers/..." />
+                    </div>
+                    <div class="form-group">
+                        <label>Role</label>
+                        <select id="nhiRole">
+                            <option>Key Vault Secrets User</option>
+                            <option>Key Vault Secrets Officer</option>
+                            <option>Key Vault Reader</option>
+                            <option>Storage Blob Data Reader</option>
+                            <option>Storage Blob Data Contributor</option>
+                            <option>Reader</option>
+                            <option>Contributor</option>
+                            <option>Monitoring Reader</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Duration (minutes)</label>
+                        <input type="number" id="nhiDuration" value="10" min="1" max="480" />
+                    </div>
+                    <div class="form-group">
+                        <label>Workflow ID</label>
+                        <input type="text" id="nhiWorkflow" value="manual-test" />
+                    </div>
+                </div>
+                <button class="btn-primary" onclick="requestNhiAccess()">Grant Access</button>
+            </div>
+            <div class="response-panel" id="nhiResponse">Waiting for request...</div>
+        </div>
+
+        <!-- Admin Access Tab -->
+        <div id="tab-admin" class="tab-content">
+            <div class="form-panel">
+                <h3>👤 Request Admin Access (Human)</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>User Object ID</label>
+                        <input type="text" id="adminUserId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" />
+                    </div>
+                    <div class="form-group">
+                        <label>Security Group ID</label>
+                        <input type="text" id="adminGroupId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" />
+                    </div>
+                    <div class="form-group">
+                        <label>Duration (minutes)</label>
+                        <input type="number" id="adminDuration" value="15" min="1" max="480" />
+                    </div>
+                    <div class="form-group full">
+                        <label>Justification (required, min 10 chars)</label>
+                        <textarea id="adminJustification" placeholder="Reason for access - e.g., Deploying compliance policy INC0012345"></textarea>
+                    </div>
+                </div>
+                <button class="btn-primary" onclick="requestAdminAccess()">Grant Access</button>
+            </div>
+            <div class="response-panel" id="adminResponse">Waiting for request...</div>
+        </div>
+
+        <!-- Timeline Tab -->
+        <div id="tab-timeline" class="tab-content">
+            <div class="form-panel">
+                <h3>📋 Access Event Timeline</h3>
+                <div class="timeline" id="timeline">
+                    <div class="empty">No events yet. Grant access to see events here.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ─── State ───────────────────────────────────
+        const state = {
+            grants: 0,
+            revokes: 0,
+            errors: 0,
+            active: 0,
+            events: [],
+        };
+
+        // ─── API helpers ─────────────────────────────
+        function getConfig() {
+            return {
+                url: document.getElementById('gatewayUrl').value.replace(/\/$/, ''),
+                key: document.getElementById('functionKey').value,
+            };
+        }
+
+        async function apiCall(endpoint, method, body) {
+            const { url, key } = getConfig();
+            if (!url || !key) {
+                alert('Please configure Gateway URL and Function Key first.');
+                return null;
+            }
+
+            try {
+                const resp = await fetch(`${url}${endpoint}`, {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-functions-key': key,
+                    },
+                    body: body ? JSON.stringify(body) : undefined,
+                });
+                return await resp.json();
+            } catch (err) {
+                state.errors++;
+                updateStats();
+                return { error: err.message };
+            }
+        }
+
+        // ─── Health check ────────────────────────────
+        async function checkHealth() {
+            const badge = document.getElementById('healthBadge');
+            badge.textContent = 'Connecting...';
+            badge.style.background = 'var(--warning)';
+
+            const result = await apiCall('/api/health', 'GET');
+            if (result && result.status === 'healthy') {
+                badge.textContent = 'Connected';
+                badge.style.background = 'var(--success)';
+            } else {
+                badge.textContent = 'Disconnected';
+                badge.style.background = 'var(--danger)';
+            }
+        }
+
+        // ─── NHI Access ─────────────────────────────
+        async function requestNhiAccess() {
+            const body = {
+                sp_object_id: document.getElementById('nhiSpId').value,
+                scope: document.getElementById('nhiScope').value,
+                role: document.getElementById('nhiRole').value,
+                duration_minutes: parseInt(document.getElementById('nhiDuration').value),
+                workflow_id: document.getElementById('nhiWorkflow').value,
+            };
+
+            const panel = document.getElementById('nhiResponse');
+            panel.textContent = 'Sending request...';
+
+            const result = await apiCall('/api/nhi-access', 'POST', body);
+            panel.textContent = JSON.stringify(result, null, 2);
+
+            if (result && result.status === 'granted') {
+                state.grants++;
+                state.active++;
+                addEvent('AccessGrant', 'nhi', body.sp_object_id, body.scope, body.role, body.duration_minutes);
+
+                // Track for auto-display of revocation
+                if (result.orchestrator_instance_id) {
+                    setTimeout(() => {
+                        state.active = Math.max(0, state.active - 1);
+                        state.revokes++;
+                        addEvent('AccessRevoke', 'nhi', body.sp_object_id, body.scope, body.role);
+                        updateStats();
+                    }, body.duration_minutes * 60 * 1000);
+                }
+            }
+            updateStats();
+        }
+
+        // ─── Admin Access ────────────────────────────
+        async function requestAdminAccess() {
+            const body = {
+                user_id: document.getElementById('adminUserId').value,
+                group_id: document.getElementById('adminGroupId').value,
+                duration_minutes: parseInt(document.getElementById('adminDuration').value),
+                justification: document.getElementById('adminJustification').value,
+            };
+
+            const panel = document.getElementById('adminResponse');
+            panel.textContent = 'Sending request...';
+
+            const result = await apiCall('/api/admin-access', 'POST', body);
+            panel.textContent = JSON.stringify(result, null, 2);
+
+            if (result && result.status === 'granted') {
+                state.grants++;
+                state.active++;
+                addEvent('AccessGrant', 'admin', body.user_id, body.group_id, null, body.duration_minutes);
+            }
+            updateStats();
+        }
+
+        // ─── Timeline ────────────────────────────────
+        function addEvent(type, identity, principalId, target, role, duration) {
+            state.events.unshift({
+                time: new Date().toISOString(),
+                type,
+                identity,
+                principalId,
+                target,
+                role,
+                duration,
+            });
+            renderTimeline();
+        }
+
+        function renderTimeline() {
+            const container = document.getElementById('timeline');
+            if (state.events.length === 0) {
+                container.innerHTML = '<div class="empty">No events yet.</div>';
+                return;
+            }
+
+            container.innerHTML = state.events.map(e => `
+                <div class="timeline-entry">
+                    <div class="timeline-dot ${e.type === 'AccessGrant' ? 'grant' : 'revoke'}"></div>
+                    <div class="time">${new Date(e.time).toLocaleString()}</div>
+                    <div class="details">
+                        <div class="event-type" style="color: ${e.type === 'AccessGrant' ? 'var(--success)' : 'var(--danger)'}">
+                            ${e.type} (${e.identity.toUpperCase()})
+                        </div>
+                        <div class="meta">
+                            Principal: ${e.principalId.substring(0, 8)}... →
+                            ${e.role ? e.role + ' on ' : ''}${e.target.split('/').pop()}
+                            ${e.duration ? ' (' + e.duration + ' min)' : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ─── Stats ──────────────────────────────────
+        function updateStats() {
+            document.getElementById('statActive').textContent = state.active;
+            document.getElementById('statGrants').textContent = state.grants;
+            document.getElementById('statRevokes').textContent = state.revokes;
+            document.getElementById('statErrors').textContent = state.errors;
+        }
+
+        // ─── Tab switching ──────────────────────────
+        function switchTab(name) {
+            document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(`tab-${name}`).classList.add('active');
+        }
+
+        // ─── Persist config in sessionStorage ───────
+        window.addEventListener('load', () => {
+            const saved = sessionStorage.getItem('privguard-config');
+            if (saved) {
+                const cfg = JSON.parse(saved);
+                document.getElementById('gatewayUrl').value = cfg.url || '';
+                document.getElementById('functionKey').value = cfg.key || '';
+            }
+        });
+
+        document.getElementById('gatewayUrl').addEventListener('change', saveConfig);
+        document.getElementById('functionKey').addEventListener('change', saveConfig);
+
+        function saveConfig() {
+            sessionStorage.setItem('privguard-config', JSON.stringify(getConfig()));
+        }
+    </script>
+</body>
+</html>

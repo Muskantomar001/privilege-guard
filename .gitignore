@@ -1,0 +1,60 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+*.manifest
+*.spec
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Azure Functions
+local.settings.json
+.python_packages/
+.func/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Deployment outputs
+.deployment-output.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Deployment outputs
+deployment-output.json
+*.log
+
+# Bicep compiled
+infra/*.json
+!infra/parameters.example.json
