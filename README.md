@@ -1,6 +1,6 @@
 # PrivilegeGuard
 
-**Zero Standing Privilege Gateway for Azure**
+**Privileged Identity Management Gateway for AI Agents & Automations**
 
 Eliminates 24/7 standing access for AI agents, automation, and service principals. Access is granted just-in-time, scoped to specific resources, and automatically revoked.
 
