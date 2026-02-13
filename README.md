@@ -45,11 +45,41 @@ Drop [`sdk/privilegeguard.py`](sdk/privilegeguard.py) into your project, then ad
 from privilegeguard import request_access
 
 # One line. That's the entire integration.
+# Change the role based on what your job needs:
 await request_access("Key Vault Secrets User", KEYVAULT_RESOURCE_ID, duration_minutes=10)
 
 # Your existing code works unchanged - access auto-revokes after 10 minutes
 secret = kv_client.get_secret("openai-api-key")
 ```
+
+**Use the role that matches your job:**
+
+| Your job needs to... | Role |
+|---|---|
+| Read secrets from Key Vault | `Key Vault Secrets User` |
+| Read + write secrets | `Key Vault Secrets Officer` |
+| Read blobs from Storage | `Storage Blob Data Reader` |
+| Write blobs to Storage | `Storage Blob Data Contributor` |
+| Read any Azure resource metadata | `Reader` |
+| Deploy/modify Azure resources | `Contributor` |
+| Read Key Vault keys (encryption) | `Key Vault Crypto User` |
+| View monitoring data | `Monitoring Reader` |
+
+If your job needs multiple resources, make multiple calls:
+
+```python
+from privilegeguard import request_access
+
+# AI agent that reads a secret and writes results to storage
+await request_access("Key Vault Secrets User", KEYVAULT_SCOPE, duration_minutes=10)
+await request_access("Storage Blob Data Contributor", STORAGE_SCOPE, duration_minutes=10)
+
+# Both roles are now active - auto-revoke after 10 minutes
+secret = kv_client.get_secret("openai-api-key")
+blob_client.upload_blob(result_data)
+```
+
+> The allow-list of roles is defined in [`function_app/config.py`](function_app/config.py) (`ROLE_DEFINITIONS`). To support additional roles, add the role name and its Azure GUID there.
 
 ### Step 3: Remove standing privileges from your service principal
 
