@@ -20,7 +20,7 @@ Eliminates 24/7 standing access for AI agents, automation, and service principal
 ```powershell
 git clone <your-repo-url>
 cd privilege-guard
-powershell -ExecutionPolicy Bypass -File scripts/Deploy-Lab.ps1
+powershell -ExecutionPolicy Bypass -File scripts/Setup-Gateway.ps1
 ```
 
 This single command:
@@ -207,8 +207,8 @@ privilege-guard/
   infra/                 # Infrastructure as Code
     main.bicep           # Complete Bicep template
   scripts/               # Deployment automation
-    Deploy-Lab.ps1       # One-command setup
-    Cleanup-Lab.ps1      # Teardown
+    Setup-Gateway.ps1    # One-command setup
+    Remove-Gateway.ps1   # Teardown
   dashboard/             # Visual testing UI
     index.html           # Static HTML dashboard
   tests/
@@ -218,7 +218,7 @@ privilege-guard/
 ## Cleanup
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts/Cleanup-Lab.ps1 -Force
+powershell -ExecutionPolicy Bypass -File scripts/Remove-Gateway.ps1 -Force
 ```
 
 ## Security Design

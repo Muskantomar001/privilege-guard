@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-    PrivilegeGuard — Cleanup script to tear down all ZSP Gateway resources.
+    PrivilegeGuard - Remove all gateway resources.
 
 .DESCRIPTION
-    Removes all Azure resources deployed by Deploy-Lab.ps1:
+    Removes all Azure resources deployed by Setup-Gateway.ps1:
       1. Deletes the Azure Resource Group (and all contained resources)
       2. Deletes Entra ID security groups
       3. Deletes the backup service principal
@@ -16,7 +16,7 @@
     Skip confirmation prompt.
 
 .EXAMPLE
-    ./Cleanup-Lab.ps1 -ProjectName "privguard" -Force
+    ./Remove-Gateway.ps1 -ProjectName "privguard" -Force
 #>
 
 [CmdletBinding()]

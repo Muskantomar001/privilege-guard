@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    PrivilegeGuard - One-command deployment.
+    PrivilegeGuard - One-command gateway setup.
 
 .DESCRIPTION
     Deploys the complete PrivilegeGuard ZSP Gateway:
@@ -20,8 +20,8 @@
     Azure region. Default: "centralindia"
 
 .EXAMPLE
-    ./Deploy-Lab.ps1
-    ./Deploy-Lab.ps1 -ProjectName "privguard" -Location "eastus"
+    ./Setup-Gateway.ps1
+    ./Setup-Gateway.ps1 -ProjectName "privguard" -Location "centralindia"
 #>
 
 [CmdletBinding()]
